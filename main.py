@@ -1,12 +1,12 @@
 import asyncio
-import aiohttp
 from openpyxl import load_workbook
-from bs4 import BeautifulSoup
 from adobe import AsyncClient
+import os
 
 
-async def main():
-    wb = load_workbook('test.xlsx')
+async def procces_file(file_name: str):
+    print(f"Обрабатываю файл {file_name}")
+    wb = load_workbook(file_name)
     ws = wb.active
 
     tasks = []
@@ -28,7 +28,18 @@ async def main():
     await asyncio.gather(*tasks)
 
     wb.save('test.xlsx')
-    print("Изменения сохранены в test.xlsx")
+    print(f"Изменения сохранены в {file_name}")
+
+
+async def main():
+    current_dir = os.getcwd()
+    xlsx_files = [f for f in os.listdir(current_dir) if f.endswith('.xlsx')]
+
+    if not xlsx_files:
+        print("Не найдены таблицы")
+
+    for file in xlsx_files:
+        await procces_file(file)
 
 
 async def fill_asset_name(url, row):
